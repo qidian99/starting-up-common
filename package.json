@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Constants and utilities used in Starting Up.",
   "main": "dist/index.bundle.js",
+  "typings": "dist/index",
   "scripts": {
     "start": "webpack-dev-server --port 9999 --inline --progress --profile --colors --watch --content-base src/ --mode development",
     "build": "webpack --config webpack.config.js --mode production",
