@@ -5,31 +5,36 @@ module.exports = function(config) {
   config.set({
     singleRun: true,
     
-    browsers: [
-      'PhantomJS'
-    ],
+    browsers: ['Chrome'],
+
 
     frameworks: [
-      'jasmine'
+      'jasmine',
+      'webpack',
     ],
 
     files: [
-      'spec.bundle.js'
+      'spec.bundle.js',
+      { pattern: 'test/**/*.test.js', watched: false }
     ],
 
     preprocessors: {
-      'spec.bundle.js': ['webpack']
+      'spec.bundle.js': ['webpack'],
+      'test/*_test.js': ['webpack'],
+      'test/**/*_test.js': ['webpack']
     },
 
-    webpack: webpackConfig,
+    // webpack: {},
 
-    webpackMiddleware: {
-      stats: 'errors-only'
-    },
+    // webpack: webpackConfig,
+
+    // webpackMiddleware: {
+    //   stats: 'errors-only'
+    // },
 
     plugins: [
       require('karma-jasmine'),
-      require('karma-phantomjs-launcher'),
+      require('karma-chrome-launcher'),
       require('karma-webpack')
     ]
   });

@@ -1,0 +1,5 @@
+export const MSG_TYPES = {
+  GAME_START: 'GAME_START',
+  GAME_UPDATE: 'GAME_UPDATE',
+  GAME_OVER: 'GAME_OVER',
+}
