@@ -1,6 +1,6 @@
 {
   "name": "starting-up-common",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Constants and utilities used in Starting Up.",
   "main": "dist/index.bundle.js",
   "typings": "dist/index",
