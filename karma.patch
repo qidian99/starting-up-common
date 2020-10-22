@@ -1,0 +1,18 @@
+diff --git a/node_modules/karma-webpack/lib/karma-webpack.js b/node_modules/karma-webpack/lib/karma-webpack.js
+index 05a35b2..8740b3a 100644
+--- a/node_modules/karma-webpack/lib/karma-webpack.js
++++ b/node_modules/karma-webpack/lib/karma-webpack.js
+@@ -113,10 +113,11 @@ function preprocessorFactory(config, emitter) {
+   return async function processFile(content, file, done) {
+     await controller.bundle();
+ 
++    const originalFileInfo = path.parse(file.path);
+     file.path = normalize(transformPath(file.path)); // eslint-disable-line no-param-reassign
+ 
+-    const bundleContent =
+-      controller.bundlesContent[getPathKey(file.path, true)];
++    const pathKey = getPathKey(file.path.replace('.js', originalFileInfo.ext), false) + '.js'
++    const bundleContent = controller.bundlesContent[pathKey];
+     done(null, bundleContent);
+   };
+ }
