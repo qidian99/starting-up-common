@@ -8,11 +8,11 @@ export * from './cycle';
 export * from './funding';
 export * from './constants';
 
-import { Greeter } from './greeter';
-import { Terrian } from './terrian';
+// import { Greeter } from './greeter';
+// import { Terrian } from './terrian';
 
-const g = new Greeter('Juri');
-g.greet();
+// const g = new Greeter('Juri');
+// g.greet();
 
-const t = new Terrian( "My Terrian", 10, 10);
-t.log();
+// const t = new Terrian( "My Terrian", 10, 10);
+// t.log();
