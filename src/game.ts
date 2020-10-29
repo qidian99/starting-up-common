@@ -24,14 +24,12 @@ export class Game {
   width: Number;
   height: Number;
   started: Boolean;
-
   cycle: Number;
   numCycles: Number;
   fundings: Funding[];
   regions: Region[];
   numCompanies: Number;
   companies: Company[];
-
   status: any[];
   update: any[];
 

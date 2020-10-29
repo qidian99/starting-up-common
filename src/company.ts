@@ -33,6 +33,8 @@ interface CompanyInterface {
   fund: Number;
   user: User;
   strategy: StrategyInterface;
+  numUsers: Number;
+  numRegions: Number;
 }
 export class Company {
   id: String;
@@ -40,13 +42,26 @@ export class Company {
   fund: Number;
   user: User;
   strategy: StrategyInterface;
+  revenue: Number;
+  numUsers: Number;
+  numRegions: Number;
 
   constructor(company: CompanyInterface) {
     const { id, name, fund, user, strategy } = company;
     this.id = id;
     this.name = name;
     this.fund = fund;
+    this.revenue = fund;
     this.user = user;
     this.strategy = strategy;
+    this.numUsers = 0;
+    this.numRegions = 0;
   }
 }
+
+export const noCompanyResult = {
+  name: "No company",
+  revenue: "N/A",
+  numUsers: "N/A",
+  numRegions: "N/A",
+};

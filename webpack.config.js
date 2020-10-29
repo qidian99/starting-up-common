@@ -15,7 +15,8 @@ module.exports = {
         filename: '[name].bundle.js',
         path: DESTINATION,
         library: "starting-up-common",
-        libraryTarget: "umd"
+        libraryTarget: "umd",
+        globalObject: 'this'
     },
 
     resolve: {
