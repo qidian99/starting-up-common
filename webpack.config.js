@@ -6,7 +6,7 @@ const DESTINATION = path.resolve( __dirname, 'dist' );
 
 module.exports = {
     context: ROOT,
-    target: "node",
+    target: 'node',
     entry: {
         'index': './index.ts'
     },
@@ -14,8 +14,8 @@ module.exports = {
     output: {
         filename: '[name].bundle.js',
         path: DESTINATION,
-        library: "starting-up-common",
-        libraryTarget: "umd",
+        library: 'starting-up-common',
+        libraryTarget: 'umd',
         globalObject: 'this'
     },
 

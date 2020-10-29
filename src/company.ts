@@ -1,20 +1,20 @@
-import { User } from "./user";
+import { User } from './user';
 
 /*
-"id": "5f9459e03fc9d9952b2bcc0f",
-"name": "Simple Company",
-"fund": 10,
-"user": {
-  "id": "5f9459c73fc9d9952b2bcc0e",
-  "email": "diqi+botb@ucsd.edu"
+'id': '5f9459e03fc9d9952b2bcc0f',
+'name': 'Simple Company',
+'fund': 10,
+'user': {
+  'id': '5f9459c73fc9d9952b2bcc0e',
+  'email': 'diqi+botb@ucsd.edu'
 },
-"strategy": {
-  "id": "5f9459e03fc9d9952b2bcc10",
-  "preseed": 0.3,
-  "seed": 0.3,
-  "seriesA": 0.3,
-  "seriesB": 0.3,
-  "seriesC": 0.3
+'strategy': {
+  'id': '5f9459e03fc9d9952b2bcc10',
+  'preseed': 0.3,
+  'seed': 0.3,
+  'seriesA': 0.3,
+  'seriesB': 0.3,
+  'seriesC': 0.3
 },
 */
 
@@ -60,8 +60,8 @@ export class Company {
 }
 
 export const noCompanyResult = {
-  name: "No company",
-  revenue: "N/A",
-  numUsers: "N/A",
-  numRegions: "N/A",
+  name: 'No company',
+  revenue: 'N/A',
+  numUsers: 'N/A',
+  numRegions: 'N/A',
 };

@@ -1,34 +1,39 @@
-import { Funding } from "./funding";
-import { Company } from "./company";
-import { Terrian } from "./terrian";
-import { Region } from "./region";
+import { Funding } from './funding';
+import { Company } from './company';
+import { Terrian } from './terrian';
+import { Region } from './region';
 
 interface GameInterface {
   id: String;
   name: String;
-  width: Number;
-  height: Number;
+  width: number;
+  height: number;
   companies: Company[];
   fundings: Funding[];
-  numCompanies: Number;
-  numCycles: Number;
-  cycle: Number;
+  numCompanies: number;
+  numCycles: number;
+  cycle: number;
   regions: Array<any>;
   started: Boolean;
   status: Array<any>;
   update: Array<any>;
 }
+
+interface GameInfoInterface {
+  message: String;
+  cycle: number;
+}
 export class Game {
   id: String;
   name: String;
-  width: Number;
-  height: Number;
+  width: number;
+  height: number;
   started: Boolean;
-  cycle: Number;
-  numCycles: Number;
+  cycle: number;
+  numCycles: number;
   fundings: Funding[];
   regions: Region[];
-  numCompanies: Number;
+  numCompanies: number;
   companies: Company[];
   status: any[];
   update: any[];
@@ -71,36 +76,41 @@ export class Game {
     this.status = status;
     this.update = update;
   }
+
+  updateGameInfo(update: GameInfoInterface) {}
+  updateGameRegion(update: GameInfoInterface) {}
+  updateGameCompany(update: GameInfoInterface) {}
+  updateGameFunding(update: GameInfoInterface) {}
 }
 
 export const simpleGameFundings = [
   {
-    name: "Seed Round Funding",
+    name: 'Seed Round Funding',
     amount: 125,
     cycle: 12,
     threshold: 20,
   },
   {
-    name: "Series A Funding",
+    name: 'Series A Funding',
     amount: 300,
     cycle: 36,
     threshold: 200,
   },
   {
-    name: "Series B Funding",
+    name: 'Series B Funding',
     amount: 500,
     cycle: 60,
     threshold: 800,
   },
   {
-    name: "Series C Funding",
+    name: 'Series C Funding',
     amount: 1000,
     cycle: 120,
     threshold: 2000,
   },
 ];
 
-export const simpleGameName = "Simple Game";
+export const simpleGameName = 'Simple Game';
 export const simpleGameNumCompanies = 1;
 export const simpleGameWidth = 3;
 export const simpleGameHeight = 3;
@@ -113,3 +123,10 @@ export const simpleGameRegion = {
   cost: 10,
   growth: 2,
 };
+
+/* Types in subscription */
+export const TYPE_GAME_INFO_UPDATE = 'ComponentGameInfoUpdate';
+export const TYPE_GAME_COMPANY_UPDATE = 'ComponentGameCompanyUpdate';
+export const TYPE_GAME_FUNDING_UPDATE = 'ComponentGameFundingUpdate';
+export const TYPE_GAME_STATUS_UPDATE = 'ComponentGameGameStatus';
+export const TYPE_GAME_REGION_UPDATE = 'ComponentGameRegionUpdate';
