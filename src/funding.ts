@@ -1,20 +1,23 @@
-interface FundingInterface {
+export interface FundingInterface {
   id: String;
-  amount: Number;
-  cycle: Number;
-  threshold: Number;
+  name: String;
+  amount: number;
+  cycle: number;
+  threshold: number;
 }
 
 export class Funding {
   id: String;
-  amount: Number;
-  cycle: Number;
-  threshold: Number;
+  name: String;
+  amount: number;
+  cycle: number;
+  threshold: number;
 
   constructor(funding: FundingInterface) {
-    const { id, amount, cycle, threshold } = funding;
+    const { id, name , amount, cycle, threshold} = funding;
 
     this.id = id;
+    this.name = name;
     this.amount = amount;
     this.cycle = cycle;
     this.threshold = threshold;

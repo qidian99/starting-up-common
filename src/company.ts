@@ -64,7 +64,9 @@ export class Company {
 }
 
 export const noCompanyResult = {
-  name: 'No company',
+  company: {
+    name: 'No company'
+  },
   revenue: 'N/A',
   numUsers: 'N/A',
   numRegions: 'N/A',

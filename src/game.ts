@@ -1,7 +1,17 @@
-import { Funding } from './funding';
-import { Company, CompanyInterface } from './company';
-import { Terrian } from './terrian';
-import { Region } from './region';
+import {
+  Funding,
+  FundingInterface
+} from './funding';
+import {
+  Company,
+  CompanyInterface
+} from './company';
+import {
+  Terrian
+} from './terrian';
+import {
+  Region
+} from './region';
 import _ from 'lodash';
 
 interface GameInterface {
@@ -14,11 +24,11 @@ interface GameInterface {
   numCompanies: number;
   numCycles: number;
   cycle: number;
-  regions: Array<any>;
+  regions: Array < any > ;
   started: Boolean;
-  status: Array<any>;
-  update: Array<any>;
-  logs: Array<string>;
+  status: Array < any > ;
+  update: Array < any > ;
+  logs: Array < string > ;
 }
 
 interface GameInfoInterface {
@@ -48,7 +58,7 @@ interface GameRegionUpdateInterface {
   RegionUserUpdate: GameRegionUserUpdateInterface[];
 }
 
-interface GameCompanyInterface {
+interface GameCompanyUserUpdateInterface {
   cycle: number;
   company: CompanyInterface;
   revenue: number;
@@ -56,7 +66,7 @@ interface GameCompanyInterface {
 }
 
 interface GameCompanyUpdateInterface {
-  CompanyUserUpdate: GameCompanyInterface[];
+  CompanyUserUpdate: GameCompanyUserUpdateInterface[];
 }
 
 interface GameStatusInterface {
@@ -66,6 +76,15 @@ interface GameStatusInterface {
   connected: Boolean;
   numRegions: number;
   numUsers: number;
+}
+
+interface GameFundingUserUpdateInterface {
+  company: CompanyInterface;
+  funding: FundingInterface;
+}
+interface GameFundingUpdateInterface {
+  cycle: number;
+  FundingUserUpdate: GameFundingUserUpdateInterface[];
 }
 
 export class Game {
@@ -82,7 +101,7 @@ export class Game {
   companies: Company[];
   status: GameStatusInterface[];
   update: any[];
-  logs: Array<string>;
+  logs: Array < string > ;
 
   constructor(game: GameInterface) {
     if (!game) {
@@ -156,6 +175,7 @@ export class Game {
     }) => {
       const companyId = typeof company === 'string' ? company : company.id.toString();
       users[companyId] = count;
+      this.logs.push(`${company.name} reached ${count} users in Region ${regionIndex}`);
     });
 
     // console.log('Updated region', region);
@@ -166,7 +186,9 @@ export class Game {
     } = gameCompanyUpdate;
 
 
-    console.log({gameCompanyUpdate});
+    console.log({
+      gameCompanyUpdate
+    });
     CompanyUserUpdate.forEach(({
       cycle,
       company,
@@ -175,7 +197,9 @@ export class Game {
     }) => {
       const companyId = company.id;
 
-      let targetCompany = _.find(this.companies, { id: companyId });
+      let targetCompany = _.find(this.companies, {
+        id: companyId
+      });
       // console.log({
       //   targetCompany,
       //   companies: this.companies,
@@ -193,18 +217,25 @@ export class Game {
       targetCompany.bankrupt = bankrupt;
 
       // Update game status
-      let currentStatus = _.find(this.status, { company: { id: companyId } });
+      let currentStatus = _.find(this.status, {
+        company: {
+          id: companyId
+        }
+      });
 
       // Get num regions
       let numRegions = 0;
       let numUsers = 0;
 
-      this.regions.forEach(({ users }) => {
+      this.regions.forEach(({
+        users
+      }) => {
         if (users[companyId] && users[companyId] > 0) {
           numRegions += 1;
           numUsers += users[companyId];
         }
       });
+
       if (!currentStatus) {
         currentStatus = {
           company,
@@ -214,24 +245,66 @@ export class Game {
           numRegions,
           numUsers,
         };
+        this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
+        if (bankrupt) {
+          this.logs.push(`${company.name} went bankrupt`);
+        }
+
         this.status.push(currentStatus);
       } else {
+
+        if (numRegions !== currentStatus.numRegions) {
+          this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
+        }
+        if (bankrupt !== currentStatus.bankrupt) {
+          this.logs.push(`${company.name} went bankrupt`);
+        }
         currentStatus.numUsers = numUsers;
         currentStatus.numRegions = numRegions;
         currentStatus.revenue = revenue;
         currentStatus.bankrupt = bankrupt;
       }
 
+      this.logs.push(`${company.name} accumulated ${numUsers} users across all Regions`);
+      this.logs.push(`${company.name} accumulated $${revenue}`);
+
       console.log({
         currentStatus,
       });
     });
   }
-  updateGameFunding(update: GameInfoInterface) {}
+  updateGameFunding(gameFundingUdpate: GameFundingUpdateInterface) {
+    const {
+      cycle,
+      FundingUserUpdate: updates,
+    } = gameFundingUdpate;
+    // console.log('updateGameFunding', {
+    //   updates
+    // });
+    updates.forEach(({
+      company,
+      funding,
+    }) => {
+
+      const companyId = company.id;
+      let companyStatus = _.find(this.status, {
+        company: {
+          id: companyId
+        }
+      });
+      // console.log('companyStatus.revenue', companyStatus, companyStatus.revenue);
+      // companyStatus.revenue += funding.amount;
+      // console.log('companyStatus.revenue', companyStatus, companyStatus.revenue);
+      // console.log('updateGameFunding', {
+      //   companyStatus,
+      //   status: this.status,
+      // });
+    });
+
+  }
 }
 
-export const simpleGameFundings = [
-  {
+export const simpleGameFundings = [{
     name: 'Seed Round Funding',
     amount: 125,
     cycle: 12,
