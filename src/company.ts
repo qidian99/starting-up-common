@@ -19,7 +19,7 @@ import { User } from './user';
 */
 
 interface StrategyInterface {
-  id: String;
+  id: string;
   preseed: number;
   seed: number;
   seriesA: number;
@@ -27,24 +27,27 @@ interface StrategyInterface {
   seriesC: number;
 }
 
-interface CompanyInterface {
-  id: String;
-  name: String;
-  fund: Number;
+export interface CompanyInterface {
+  id: string;
+  name: string;
+  fund: number;
   user: User;
   strategy: StrategyInterface;
-  numUsers: Number;
-  numRegions: Number;
+  numUsers: number;
+  numRegions: number;
+  revenue: number;
+  bankrupt: Boolean;
 }
 export class Company {
-  id: String;
-  name: String;
-  fund: Number;
+  id: string;
+  name: string;
+  fund: number;
   user: User;
   strategy: StrategyInterface;
-  revenue: Number;
-  numUsers: Number;
-  numRegions: Number;
+  revenue: number;
+  numUsers: number;
+  numRegions: number;
+  bankrupt: Boolean;
 
   constructor(company: CompanyInterface) {
     const { id, name, fund, user, strategy } = company;
@@ -56,6 +59,7 @@ export class Company {
     this.strategy = strategy;
     this.numUsers = 0;
     this.numRegions = 0;
+    this.bankrupt = false;
   }
 }
 

@@ -1,21 +1,28 @@
 interface RegionInterface {
-  conversionRate: number;
-  cost: Number;
-  growth: Number;
+  conversionRate: Number;
+  cost: number;
+  growth: number;
   id: String;
-  leavingRate: number;
+  leavingRate: Number;
   population: number;
-  revenue: Number;
+  revenue: number;
+  index: number;
+}
+
+interface RegionUserInterface {
+  [key: string]: number;
 }
 
 export class Region {
-  conversionRate: number;
-  cost: Number;
-  growth: Number;
+  conversionRate: Number;
+  cost: number;
+  growth: number;
   id: String;
-  leavingRate: number;
+  leavingRate: Number;
   population: number;
-  revenue: Number;
+  revenue: number;
+  index: number;
+  users: RegionUserInterface;
 
   constructor(region: RegionInterface) {
     const {
@@ -26,6 +33,7 @@ export class Region {
       leavingRate,
       population,
       revenue,
+      index,
     } = region;
 
     this.conversionRate = conversionRate;
@@ -35,5 +43,7 @@ export class Region {
     this.leavingRate = leavingRate;
     this.population = population;
     this.revenue = revenue;
+    this.index = index;
+    this.users = {};
   }
 }
