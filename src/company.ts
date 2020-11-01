@@ -1,4 +1,4 @@
-import { User } from './user';
+import { User, UserInterface } from './user';
 
 /*
 'id': '5f9459e03fc9d9952b2bcc0f',
@@ -31,7 +31,7 @@ export interface CompanyInterface {
   id: string;
   name: string;
   fund: number;
-  user: User;
+  user: UserInterface;
   strategy: StrategyInterface;
   numUsers: number;
   numRegions: number;

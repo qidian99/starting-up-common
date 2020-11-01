@@ -141,7 +141,7 @@ export class Game {
     this.companies = companies.map((company) => new Company(company));
 
     // Set logs
-    this.status = status;
+    this.status = [...status];
     this.update = update;
     this.logs = [];
   }
@@ -185,93 +185,104 @@ export class Game {
       CompanyUserUpdate
     } = gameCompanyUpdate;
 
-
-    console.log({
-      gameCompanyUpdate
-    });
-    CompanyUserUpdate.forEach(({
-      cycle,
-      company,
-      revenue,
-      bankrupt,
-    }) => {
-      const companyId = company.id;
-
-      let targetCompany = _.find(this.companies, {
-        id: companyId
-      });
-      // console.log({
-      //   targetCompany,
-      //   companies: this.companies,
-      //   companyId
-      // });
-
-      if (!targetCompany) {
-        // IN DEV
-        this.companies.push(new Company(company));
-        targetCompany = company;
-        // return;
-      }
-
-      targetCompany.revenue = revenue;
-      targetCompany.bankrupt = bankrupt;
-
-      // Update game status
-      let currentStatus = _.find(this.status, {
-        company: {
-          id: companyId
-        }
-      });
-
-      // Get num regions
-      let numRegions = 0;
-      let numUsers = 0;
-
-      this.regions.forEach(({
-        users
+    try {
+      CompanyUserUpdate.forEach(({
+        cycle,
+        company,
+        revenue,
+        bankrupt,
       }) => {
-        if (users[companyId] && users[companyId] > 0) {
-          numRegions += 1;
-          numUsers += users[companyId];
+        const companyId = company.id;
+
+        let targetCompany = _.find(this.companies, (c) => c.id === companyId);
+
+        // console.log({
+        //   targetCompany,
+        // });
+        // console.log({
+        //   targetCompany,
+        //   companies: this.companies,
+        //   companyId
+        // });
+
+        if (!targetCompany) {
+          // IN DEV
+          this.companies.push(new Company(company));
+          targetCompany = company;
+          // return;
         }
-      });
 
-      if (!currentStatus) {
-        currentStatus = {
-          company,
-          revenue,
-          bankrupt,
-          connected: true,
-          numRegions,
-          numUsers,
-        };
-        this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
-        if (bankrupt) {
-          this.logs.push(`${company.name} went bankrupt`);
-        }
+        targetCompany.revenue = revenue;
+        targetCompany.bankrupt = bankrupt;
 
-        this.status.push(currentStatus);
-      } else {
+        // Update game status
+        let currentStatus = _.find(this.status, {
+          company: {
+            id: companyId
+          }
+        });
 
-        if (numRegions !== currentStatus.numRegions) {
+        console.log({
+          gameCompanyUpdate,
+          companies: this.companies,
+          status: this.status,
+        });
+
+        // Get num regions
+        let numRegions = 0;
+        let numUsers = 0;
+
+        this.regions.forEach(({
+          users
+        }) => {
+          if (users[companyId] && users[companyId] > 0) {
+            numRegions += 1;
+            numUsers += users[companyId];
+          }
+        });
+
+        if (!currentStatus) {
+          currentStatus = {
+            company,
+            revenue,
+            bankrupt,
+            connected: true,
+            numRegions,
+            numUsers,
+          };
           this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
-        }
-        if (bankrupt !== currentStatus.bankrupt) {
-          this.logs.push(`${company.name} went bankrupt`);
-        }
-        currentStatus.numUsers = numUsers;
-        currentStatus.numRegions = numRegions;
-        currentStatus.revenue = revenue;
-        currentStatus.bankrupt = bankrupt;
-      }
+          if (bankrupt) {
+            this.logs.push(`${company.name} went bankrupt`);
+          }
 
-      this.logs.push(`${company.name} accumulated ${numUsers} users across all Regions`);
-      this.logs.push(`${company.name} accumulated $${revenue}`);
+          console.log(1111, typeof this.status);
+          this.status.push(currentStatus);
+          console.log(2222);
 
-      console.log({
-        currentStatus,
+        } else {
+
+          if (numRegions !== currentStatus.numRegions) {
+            this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
+          }
+          if (bankrupt !== currentStatus.bankrupt) {
+            this.logs.push(`${company.name} went bankrupt`);
+          }
+          currentStatus.numUsers = numUsers;
+          currentStatus.numRegions = numRegions;
+          currentStatus.revenue = revenue;
+          currentStatus.bankrupt = bankrupt;
+        }
+
+        this.logs.push(`${company.name} accumulated ${numUsers} users across all Regions`);
+        this.logs.push(`${company.name} accumulated ${revenue}`);
+
+        console.log({
+          currentStatus,
+        });
       });
-    });
+    } catch (e) {
+      console.log(e);
+    }
   }
   updateGameFunding(gameFundingUdpate: GameFundingUpdateInterface) {
     const {
