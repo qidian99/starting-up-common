@@ -417,7 +417,7 @@ export class Game {
 
         this.companies.forEach((company) => {
           const companyId = company.id;
-           // Update game status
+          // Update game status
           let currentStatus = _.find(this.status, {
             company: {
               id: companyId
@@ -512,3 +512,26 @@ export const TYPE_GAME_COMPANY_UPDATE = 'ComponentGameCompanyUpdate';
 export const TYPE_GAME_FUNDING_UPDATE = 'ComponentGameFundingUpdate';
 export const TYPE_GAME_STATUS_UPDATE = 'ComponentGameGameStatus';
 export const TYPE_GAME_REGION_UPDATE = 'ComponentGameRegionUpdate';
+
+/* Tips */
+export const STRATEGY_TIPS = [{
+    text: 'It’s become increasingly common for startups to raise several seed rounds, and this has led to a bifurcation in the seed stage between what are known as “pre-seed” (or “genesis”) and institutional seed rounds.',
+    link: 'https://nextviewventures.com/blog/what-are-pre-seed-rounds/',
+  },
+  {
+    text: 'Seed funding is the first official equity funding stage. It typically represents the first official money that a business venture or enterprise raises. Some companies never extend beyond seed funding into Series A rounds or beyond',
+    link: 'https://www.investopedia.com/articles/personal-finance/102015/series-b-c-funding-what-it-all-means-and-how-it-works.asp',
+  },
+  {
+    text: 'Once a business has developed a track record (an established user base, consistent revenue figures, or some other key performance indicator), that company may opt for Series A funding in order to further optimize its user base and product offerings.',
+    link: 'https://www.investopedia.com/articles/personal-finance/102015/series-b-c-funding-what-it-all-means-and-how-it-works.asp',
+  },
+  {
+    text: 'Series B rounds are all about taking businesses to the next level, past the development stage. Investors help startups get there by expanding market reach.',
+    link: 'https://www.investopedia.com/articles/personal-finance/102015/series-b-c-funding-what-it-all-means-and-how-it-works.asp',
+  },
+  {
+    text: 'Series C funding is focused on scaling the company, growing as quickly and as successfully as possible.',
+    link: 'https://www.investopedia.com/articles/personal-finance/102015/series-b-c-funding-what-it-all-means-and-how-it-works.asp',
+  },
+];
