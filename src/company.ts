@@ -54,7 +54,7 @@ export class Company {
     this.id = id;
     this.name = name;
     this.fund = fund;
-    this.revenue = fund;
+    this.revenue = 0;
     this.user = user;
     this.strategy = strategy;
     this.numUsers = 0;

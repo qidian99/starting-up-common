@@ -13,6 +13,9 @@ import {
   Region
 } from './region';
 import _ from 'lodash';
+import {
+  MSG_TYPES
+} from './constants';
 
 interface GameInterface {
   id: string;
@@ -59,17 +62,18 @@ interface GameRegionUpdateInterface {
 }
 
 interface GameCompanyUserUpdateInterface {
-  cycle: number;
   company: CompanyInterface;
   revenue: number;
   bankrupt: Boolean;
 }
 
 interface GameCompanyUpdateInterface {
+  cycle: number;
   CompanyUserUpdate: GameCompanyUserUpdateInterface[];
 }
 
 interface GameStatusInterface {
+  cycle ? : number;
   company: CompanyInterface;
   revenue: number;
   bankrupt: Boolean;
@@ -88,6 +92,7 @@ interface GameFundingUpdateInterface {
 }
 
 export class Game {
+  // Model
   id: string;
   name: string;
   width: number;
@@ -102,6 +107,11 @@ export class Game {
   status: GameStatusInterface[];
   update: any[];
   logs: Array < string > ;
+  logCycles: Array < number > ;
+  // Game control
+  end: Boolean;
+  // For replay
+  currentCycle: number;
 
   constructor(game: GameInterface) {
     if (!game) {
@@ -135,7 +145,7 @@ export class Game {
 
     // Create nested Funding and Region objects
     this.fundings = fundings.map((funding) => new Funding(funding));
-    this.regions = regions.map((region) => new Region(region));
+    this.regions = _.sortBy(regions, 'index').map((region) => new Region(region));
 
     // Create companies
     this.companies = companies.map((company) => new Company(company));
@@ -144,6 +154,16 @@ export class Game {
     this.status = [...status];
     this.update = update;
     this.logs = [];
+    this.logCycles = [];
+
+    // Replay
+    this.end = false;
+    this.currentCycle = 0;
+  }
+
+  updateLogs(log: string, cycle: number) {
+    this.logs.push(log);
+    this.logCycles.push(cycle);
   }
 
   updateGameInfo(gameInfoUpdate: GameInfoInterface) {
@@ -153,11 +173,20 @@ export class Game {
       message,
     } = gameInfoUpdate;
     // Update game logs
-    this.logs.push(`Cycle ${cycle}: ${message}`);
+    switch (message) {
+      case MSG_TYPES.GAME_OVER: {
+        this.end = true;
+        this.updateLogs(`Game over.`, cycle);
+        break;
+      }
+      default:
+        this.updateLogs(`Cycle ${cycle}: ${message}`, cycle);
+    }
   }
-  updateGameRegion(gameRegionUpdate: GameRegionUpdateInterface) {
+  updateGameRegion(gameRegionUpdate: GameRegionUpdateInterface, reverse = false) {
     // console.log('gameInfoUpdate', gameRegionUpdate);
     const {
+      cycle,
       RegionUserUpdate,
       region: {
         index: regionIndex,
@@ -174,20 +203,28 @@ export class Game {
       count
     }) => {
       const companyId = typeof company === 'string' ? company : company.id.toString();
-      users[companyId] = count;
-      this.logs.push(`${company.name} reached ${count} users in Region ${regionIndex}`);
+      if (reverse) {
+        users[companyId] -= count;
+      } else {
+        if (companyId in users) {
+          users[companyId] += count;
+        } else {
+          users[companyId] = count;
+        }
+        this.updateLogs(`${company.name} reached ${users[companyId]} users in Region ${regionIndex}`, cycle);
+      }
     });
 
     // console.log('Updated region', region);
   }
-  updateGameCompany(gameCompanyUpdate: GameCompanyUpdateInterface) {
+  updateGameCompany(gameCompanyUpdate: GameCompanyUpdateInterface, reverse = false) {
     const {
-      CompanyUserUpdate
+      CompanyUserUpdate,
+      cycle,
     } = gameCompanyUpdate;
 
     try {
       CompanyUserUpdate.forEach(({
-        cycle,
         company,
         revenue,
         bankrupt,
@@ -204,15 +241,20 @@ export class Game {
         //   companies: this.companies,
         //   companyId
         // });
-
         if (!targetCompany) {
           // IN DEV
-          this.companies.push(new Company(company));
-          targetCompany = company;
+          targetCompany = new Company(company);
+          this.companies.push(targetCompany);
           // return;
         }
 
-        targetCompany.revenue = revenue;
+        if (reverse) {
+          targetCompany.revenue -= revenue;
+          console.log('reversing', revenue);
+        } else {
+          targetCompany.revenue += revenue;
+        }
+
         targetCompany.bankrupt = bankrupt;
 
         // Update game status
@@ -222,11 +264,11 @@ export class Game {
           }
         });
 
-        console.log({
-          gameCompanyUpdate,
-          companies: this.companies,
-          status: this.status,
-        });
+        // console.log({
+        //   gameCompanyUpdate,
+        //   companies: this.companies,
+        //   status: this.status,
+        // });
 
         // Get num regions
         let numRegions = 0;
@@ -241,8 +283,13 @@ export class Game {
           }
         });
 
+
+        if (reverse) return;
+
+        // Update current status for each company
         if (!currentStatus) {
           currentStatus = {
+            cycle,
             company,
             revenue,
             bankrupt,
@@ -250,31 +297,28 @@ export class Game {
             numRegions,
             numUsers,
           };
-          this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
+          this.updateLogs(`${company.name} scaled its business to ${numRegions} Regions`, cycle);
           if (bankrupt) {
-            this.logs.push(`${company.name} went bankrupt`);
+            this.updateLogs(`${company.name} went bankrupt`, cycle);
           }
-
-          console.log(1111, typeof this.status);
           this.status.push(currentStatus);
-          console.log(2222);
 
         } else {
-
           if (numRegions !== currentStatus.numRegions) {
-            this.logs.push(`${company.name} scaled its business to ${numRegions} Regions`);
+            this.updateLogs(`${company.name} scaled its business to ${numRegions} Regions`, cycle);
           }
           if (bankrupt !== currentStatus.bankrupt) {
-            this.logs.push(`${company.name} went bankrupt`);
+            targetCompany.bankrupt = bankrupt;
+            this.updateLogs(`${company.name} went bankrupt`, cycle);
           }
           currentStatus.numUsers = numUsers;
           currentStatus.numRegions = numRegions;
-          currentStatus.revenue = revenue;
-          currentStatus.bankrupt = bankrupt;
+          currentStatus.revenue = targetCompany.revenue;
+          currentStatus.bankrupt = targetCompany.bankrupt;
         }
 
-        this.logs.push(`${company.name} accumulated ${numUsers} users across all Regions`);
-        this.logs.push(`${company.name} accumulated ${revenue}`);
+        this.updateLogs(`${company.name} accumulated ${numUsers} users across all Regions`, cycle);
+        this.updateLogs(`${company.name} accumulated ${revenue}`, cycle);
 
         console.log({
           currentStatus,
@@ -313,6 +357,104 @@ export class Game {
     });
 
   }
+
+  goto(cycle: number) {
+    try {
+      if (cycle > this.currentCycle) {
+        const updates = _.filter(this.update, (u) => u.cycle > this.currentCycle && u.cycle <= cycle);
+        updates.forEach((update) => {
+          switch (update.__typename) {
+            case TYPE_GAME_INFO_UPDATE: {
+              this.updateGameInfo(update);
+              break;
+            }
+            case TYPE_GAME_REGION_UPDATE: {
+              this.updateGameRegion(update);
+              break;
+            }
+            case TYPE_GAME_COMPANY_UPDATE: {
+              this.updateGameCompany(update);
+              break;
+            }
+            case TYPE_GAME_FUNDING_UPDATE: {
+              this.updateGameFunding(update);
+              break;
+            }
+            default: {}
+          }
+        });
+      } else {
+        const updates = _.reverse(_.filter(this.update, (u) => u.cycle <= this.currentCycle && u.cycle > cycle));
+        console.log({
+          updates
+        });
+        updates.forEach((update) => {
+          switch (update.__typename) {
+            case TYPE_GAME_INFO_UPDATE: {
+              this.updateGameInfo(update);
+              break;
+            }
+            case TYPE_GAME_REGION_UPDATE: {
+              this.updateGameRegion(update, true);
+              break;
+            }
+            case TYPE_GAME_COMPANY_UPDATE: {
+              this.updateGameCompany(update, true);
+              break;
+            }
+            case TYPE_GAME_FUNDING_UPDATE: {
+              this.updateGameFunding(update);
+              break;
+            }
+            default: {}
+          }
+        });
+        const logIndex = this.logCycles.findIndex((c) => c > cycle);
+        if (logIndex !== -1) {
+          this.logs.splice(logIndex);
+          this.logCycles.splice(logIndex);
+        }
+
+        this.companies.forEach((company) => {
+          const companyId = company.id;
+           // Update game status
+          let currentStatus = _.find(this.status, {
+            company: {
+              id: companyId
+            }
+          });
+
+          // console.log({
+          //   gameCompanyUpdate,
+          //   companies: this.companies,
+          //   status: this.status,
+          // });
+
+          // Get num regions
+          let numRegions = 0;
+          let numUsers = 0;
+
+          this.regions.forEach(({
+            users
+          }) => {
+            if (users[companyId] && users[companyId] > 0) {
+              numRegions += 1;
+              numUsers += users[companyId];
+            }
+          });
+          currentStatus.numUsers = numUsers;
+          currentStatus.numRegions = numRegions;
+          currentStatus.revenue = company.revenue;
+          currentStatus.bankrupt = company.bankrupt;
+        });
+      }
+
+      this.currentCycle = cycle;
+    } catch (e) {
+      console.log(e);
+    }
+
+  }
 }
 
 export const simpleGameFundings = [{
@@ -346,6 +488,7 @@ export const simpleGameNumCompanies = 1;
 export const simpleGameWidth = 3;
 export const simpleGameHeight = 3;
 export const simpleGameNumCycles = 240;
+export const simpleGameInitialUsers = 10;
 export const simpleGameRegion = {
   population: 100,
   conversionRate: 0.01,
@@ -354,6 +497,14 @@ export const simpleGameRegion = {
   cost: 10,
   growth: 2,
 };
+
+export const simpleGameStrategies = [
+  'preseed',
+  'seed',
+  'seriesA',
+  'seriesB',
+  'seriesC',
+];
 
 /* Types in subscription */
 export const TYPE_GAME_INFO_UPDATE = 'ComponentGameInfoUpdate';
